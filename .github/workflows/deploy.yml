@@ -25,6 +25,8 @@ jobs:
             echo "Creating gh-pages branch..."
             git checkout --orphan gh-pages
             git reset --hard
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
             echo "<h1>Initializing GitHub Pages...</h1>" > index.html
             git add index.html
             git commit -m "Initialize gh-pages branch"

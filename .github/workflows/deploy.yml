@@ -18,6 +18,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Ensure gh-pages branch exists
+        run: |
+          git fetch origin
+          if ! git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
+            echo "Creating gh-pages branch..."
+            git checkout --orphan gh-pages
+            git reset --hard
+            echo "<h1>Initializing GitHub Pages...</h1>" > index.html
+            git add index.html
+            git commit -m "Initialize gh-pages branch"
+            git push origin gh-pages
+            git checkout main
+          else
+            echo "gh-pages branch already exists."
+          fi
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -40,14 +56,29 @@ jobs:
 
   deploy-pages:
     needs: deploy
+    runs-on: ubuntu-latest
     permissions:
       pages: write
       id-token: write
+      contents: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        continue-on-error: true
+
+      - name: Fallback manual deploy if API fails
+        if: failure()
+        run: |
+          echo "API-based Pages deployment failed. Using manual fallback..."
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages
+          git checkout gh-pages
+          cp -r ../public/* .
+          git add .
+          git commit -m "Manual Pages deploy via fallback [skip ci]" || echo "No changes"
+          git push origin gh-pages

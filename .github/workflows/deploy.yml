@@ -1,0 +1,22 @@
+name: Deploy to Hugging Face Spaces
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Build Docker
+      run: docker build -t llm-task-api .
+
+    - name: Hugging Face login
+      run: echo ${{ secrets.HF_TOKEN }} | huggingface-cli login
+
+    - name: Push to Hugging Face
+      run: huggingface-cli upload ./ --repo-id YOUR_HF_USERNAME/llm-task-space --repo-type space

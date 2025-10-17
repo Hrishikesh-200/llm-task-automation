@@ -3,17 +3,18 @@ name: Deploy GitHub Pages
 on:
   push:
     branches:
-      - main         # Trigger workflow whenever the main branch is updated
+      - main  # or master, depending on your repo
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read   # Required to checkout repo files
-      pages: write     # Required to publish to GitHub Pages
+      contents: read       # for checking out repo
+      pages: write         # for deploying Pages
+      id-token: write      # REQUIRED for deploy-pages v4
 
     steps:
-      - uses: actions/checkout@v3       # Checkout your repo
+      - uses: actions/checkout@v3
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4  # Deploy the HTML/CSS/JS files
+        uses: actions/deploy-pages@v4

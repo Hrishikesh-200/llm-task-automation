@@ -14,29 +14,9 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Ensure gh-pages branch exists
-        run: |
-          git fetch origin
-          if ! git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
-            echo "Creating gh-pages branch..."
-            git checkout --orphan gh-pages
-            git reset --hard
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            echo "<h1>Initializing GitHub Pages...</h1>" > index.html
-            git add index.html
-            git commit -m "Initialize gh-pages branch"
-            git push origin gh-pages
-            git checkout main
-          else
-            echo "gh-pages branch already exists."
-          fi
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -48,26 +28,19 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Build site or generate HTML
+      - name: Prepare HTML
         run: |
           mkdir -p public
-          cp index.html public/index.html   # Copy your main.html to public/
+          # Copy your index.html and any other files into public/
+          cp index.html public/
+          # You can also generate dynamic content here if needed
+          echo "<h1>Deployment Successful!</h1>" >> public/index.html
 
       - name: Upload artifact for GitHub Pages
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
           path: public
 
-  deploy-pages:
-    needs: deploy
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-    permissions:
-      pages: write
-      id-token: write
-      contents: write
-    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

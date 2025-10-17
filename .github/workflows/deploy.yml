@@ -1,9 +1,10 @@
-name: Deploy Pages
+name: Deploy GitHub Pages
 
+# Trigger deployment on push to main branch
 on:
   push:
     branches:
-      - main  # deploy when main branch is updated
+      - main
 
 jobs:
   deploy:
@@ -14,13 +15,17 @@ jobs:
       id-token: write
 
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Step 2: Upload artifact for GitHub Pages deployment
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: ./  # folder containing index.html and assets
+          path: ./  # Ensure index.html is in root or adjust path
 
+      # Step 3: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
+

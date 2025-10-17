@@ -3,7 +3,7 @@ name: Deploy GitHub Pages
 on:
   push:
     branches:
-      - main  # Change if your default branch is 'master' or something else
+      - main
   workflow_dispatch:
 
 jobs:
@@ -12,19 +12,17 @@ jobs:
     permissions:
       contents: read
       pages: write
-      id-token: write  # Required for deploy-pages@v4
+      id-token: write
 
     steps:
-      # Step 1: Checkout your repo
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Upload HTML (or other static) files as artifact
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: ./  # Root of repo; adjust if your HTML is in a subfolder
+          path: ./  # Your root folder or folder containing index.html
 
-      # Step 3: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
+

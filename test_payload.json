@@ -1,0 +1,13 @@
+{
+  "email": "student@example.com",
+  "secret": "hris@tds_proj1_term3",
+  "task": "captcha-solver-demo",
+  "round": 1,
+  "nonce": "ab12-xyz",
+  "brief": "Generate a single-page captcha solver that shows a sample captcha and its solved text",
+  "checks": [
+    "document.title === `Captcha Solver Demo`",
+    "document.querySelector('#captcha') !== null"
+  ],
+  "evaluation_url": "https://example.com/notify"
+}

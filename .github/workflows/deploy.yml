@@ -14,8 +14,7 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -30,17 +29,29 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Prepare HTML
+      - name: Run main.py to generate HTML
+        run: |
+          python main.py  # Ensure main.py writes index.html or public/ folder
+
+      - name: Prepare artifact for Pages
         run: |
           mkdir -p public
-          cp index.html public/
-          echo "<h1>Deployment Successful!</h1>" >> public/index.html
+          cp index.html public/  # or copy all generated HTML
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
           path: public
 
+  deploy-pages:
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+      contents: write
+    environment:
+      name: github-pages
+    steps:
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v4

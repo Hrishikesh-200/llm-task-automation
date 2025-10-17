@@ -30,13 +30,12 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Run main.py to generate HTML
-        run: |
-          python main.py  # Ensure main.py writes index.html or public/ folder
+        run: python main.py
 
-      - name: Prepare artifact for Pages
+      - name: Prepare artifact for GitHub Pages
         run: |
           mkdir -p public
-          cp index.html public/  # or copy all generated HTML
+          cp index.html public/
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v3

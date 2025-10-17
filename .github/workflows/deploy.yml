@@ -3,18 +3,25 @@ name: Deploy GitHub Pages
 on:
   push:
     branches:
-      - main  # or master, depending on your repo
+      - main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: read       # for checking out repo
-      pages: write         # for deploying Pages
-      id-token: write      # REQUIRED for deploy-pages v4
-
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: '.'  # root of repo where index.html is located
+
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4

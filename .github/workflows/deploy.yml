@@ -1,4 +1,4 @@
-name: Deploy LLM Task HTML to GitHub Pages
+name: Deploy HTML to GitHub Pages
 
 on:
   push:
@@ -12,9 +12,10 @@ permissions:
   id-token: write
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
-
+    environment:
+      name: github-pages
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,6 +24,7 @@ jobs:
         run: |
           git fetch origin
           if ! git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
+            echo "Creating gh-pages branch..."
             git checkout --orphan gh-pages
             git reset --hard
             git config user.name "github-actions[bot]"
@@ -32,6 +34,8 @@ jobs:
             git commit -m "Initialize gh-pages branch"
             git push origin gh-pages
             git checkout main
+          else
+            echo "gh-pages branch already exists."
           fi
 
       - name: Set up Python
@@ -44,18 +48,26 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Generate HTML
+      - name: Build site or generate HTML
         run: |
-          # Run your Python script to generate HTML
-          python main.py
           mkdir -p public
-          cp index.html public/index.html
+          cp index.html public/index.html   # Copy your main.html to public/
 
       - name: Upload artifact for GitHub Pages
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v1
         with:
           path: public
 
+  deploy-pages:
+    needs: deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    permissions:
+      pages: write
+      id-token: write
+      contents: write
+    steps:
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
         id: deployment
+        uses: actions/deploy-pages@v4

@@ -136,3 +136,8 @@ async def run_task(request: Request):
 @app.get("/ping")
 async def ping():
     return {"status": "ok"}
+
+@app.get("/")
+async def root():
+    return {"status": "✅ LLM Task Automation API is live!"}
+

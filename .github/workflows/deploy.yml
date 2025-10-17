@@ -14,6 +14,8 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -31,9 +33,7 @@ jobs:
       - name: Prepare HTML
         run: |
           mkdir -p public
-          # Copy your index.html and any other files into public/
           cp index.html public/
-          # You can also generate dynamic content here if needed
           echo "<h1>Deployment Successful!</h1>" >> public/index.html
 
       - name: Upload artifact for GitHub Pages

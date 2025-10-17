@@ -1,86 +1,19 @@
-name: Deploy HTML to GitHub Pages
+name: Deploy GitHub Pages
 
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
-
-permissions:
-  contents: write
-  pages: write
-  id-token: write
+      - main         # Trigger workflow whenever the main branch is updated
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
-      - name: Ensure gh-pages branch exists
-        run: |
-          git fetch origin
-          if ! git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
-            echo "Creating gh-pages branch..."
-            git checkout --orphan gh-pages
-            git reset --hard
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            echo "<h1>Initializing GitHub Pages...</h1>" > index.html
-            git add index.html
-            git commit -m "Initialize gh-pages branch"
-            git push origin gh-pages
-            git checkout main
-          else
-            echo "gh-pages branch already exists."
-          fi
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-      - name: Build site or generate HTML
-        run: |
-          mkdir -p public
-          echo "<h1>Deployment Successful!</h1>" > public/index.html
-
-      - name: Upload artifact for GitHub Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: public
-
-  deploy-pages:
-    needs: deploy
-    runs-on: ubuntu-latest
     permissions:
-      pages: write
-      id-token: write
-      contents: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-        continue-on-error: true
+      contents: read   # Required to checkout repo files
+      pages: write     # Required to publish to GitHub Pages
 
-      - name: Fallback manual deploy if API fails
-        if: failure()
-        run: |
-          echo "API-based Pages deployment failed. Using manual fallback..."
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin gh-pages
-          git checkout gh-pages
-          cp -r ../public/* .
-          git add .
-          git commit -m "Manual Pages deploy via fallback [skip ci]" || echo "No changes"
-          git push origin gh-pages
+    steps:
+      - uses: actions/checkout@v3       # Checkout your repo
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4  # Deploy the HTML/CSS/JS files
